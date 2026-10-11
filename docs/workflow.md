@@ -1,27 +1,27 @@
-# Criterios de edición
+# Editing criteria
 
-## Antes de renderizar
+## Before rendering
 
-Entender el objetivo y qué se promociona, audiencia, formato y duración. Confirmar orden e inicio/cierre obligatorios si no están definidos. Mirar los ejemplos reales para medir texto, márgenes, posición, ritmo, transiciones y proporción. Si el usuario quiere todo el recorrido, la primera versión conserva la historia antes de intentar resumir.
+Understand the objective, what is being promoted, the audience, format, and duration. Confirm the order and required opening/closing if they have not been defined. Inspect actual examples to assess text, margins, placement, pacing, transitions, and proportions. If the user wants the entire sequence, preserve the story in the first version before trying to shorten it.
 
-Inventariar con ffprobe resolución real, orientación/rotación, FPS variable, duración, audio, tags de color y profundidad. Escuchar la voz y mirar comienzo/final de cada clip. Recortar ruido de cámara, espera y preparación sin cortar consonantes, respiraciones naturales ni el gesto final. Silencedetect puede ayudar pero tráfico, música y habitaciones ruidosas confunden el umbral.
+Use ffprobe to inventory actual resolution, orientation/rotation, variable frame rates, duration, audio, color tags, and bit depth. Listen to the speech and inspect each clip's beginning/end. Trim camera noise, waiting, and setup without cutting consonants, natural breaths, or the final gesture. Silencedetect can help, but traffic, music, and noisy rooms can confuse its threshold.
 
-Whisper entrega una transcripción de partida; corregir puntuación, nombres, comida/lugares y palabras del hablante. Sus timestamps/DTW no son verdad absoluta. Mantener inicio/cierre hablados si fueron pedidos; elegir B-roll relevante que no tape la presentación personal final.
+Whisper provides a starting transcript; correct punctuation, names, food/place references, and the speaker's words. Its timestamps/DTW alignment are not absolute truth. Keep the spoken opening/closing when requested; choose relevant B-roll that does not obscure the final personal introduction.
 
-## Montaje y voz
+## Montage and narration
 
-Agrupar la voz por escena. Usar planos de apoyo para ilustrar lo que se dice, con entradas rápidas cuando son detalles; conservar más tiempo cuando el lugar o persona necesita leerse. El audio útil sigue siendo el del hablante. No añadir audio de apoyo o música salvo pedido explícito.
+Group narration by scene. Use B-roll to illustrate what is being said, with quick entries for details; allow more time when the location or person needs to be understood. The useful audio remains the speaker's track. Do not add B-roll audio or music unless explicitly requested.
 
-Las transiciones deben acompañar movimiento y composición. Negro breve entre lugares, giro/zoom donde el movimiento lo permite, deslizamiento en recorridos o disolvencia para continuidad. Variar con criterio, no aplicar todos los efectos por igual. Revisar que el giro no revele esquinas negras ni corte el rostro. Los scripts clonan handles visuales; si se nota congelado, conseguir handles reales o cambiar la transición.
+Transitions should follow movement and composition. Use a brief dip to black between locations, rotation/zoom where the movement supports it, a slide during movement through a location, or a dissolve for continuity. Vary transitions thoughtfully rather than applying every effect uniformly. Check that rotation does not reveal black corners or crop the face. The scripts clone visual handles; if the freeze is noticeable, obtain real handles or change the transition.
 
-Separar ritmo visual de la voz: un efecto de medio segundo no exige solapar dos frases ese tiempo. Crossfade corto, con recortes que eviten superponer palabras. Rellenar audio de cada escena hasta su duración antes de concatenar (apad + atrim): evitar que diferencias pequeñas se acumulen y desincronicen subtítulos. La limpieza sugerida es moderada, pero hay que escuchar que no suene metálica.
+Separate visual pacing from narration: a half-second effect does not require overlapping two phrases for that long. Use a short crossfade and trims that avoid overlapping words. Pad each scene's audio to its duration before concatenation (apad + atrim) to prevent small differences from accumulating and desynchronizing captions. The suggested cleanup is restrained, but listen for metallic artifacts.
 
-## Subtítulos
+## Captions
 
-Frases cortas alineadas con las palabras, amarillo brillante y caja negra sólida. Tamaño inicial equivalente a 144px en ancho 2160, regular, posición cerca de 75% de altura; ajustar a referencia y zonas de UI del destino. Entrada breve con escala y opacidad, sin animación que distraiga. Dividir frases largas, no reducir el tamaño hasta que sea ilegible. El motor Pillow reemplaza el rasterizador AppKit/Swift de prototipos locales: misma estrategia de capa RGBA, portable y con fuente explícita.
+Use short phrases aligned with speech, bright yellow text, and a solid black box. Start with a regular font equivalent to 144 px at a width of 2160, placed near 75% of the frame height; adjust to the reference and the destination's UI safe areas. Use a brief entrance with scale and opacity, avoiding distracting animation. Split long phrases rather than reducing the font until it is unreadable. The Pillow engine replaces the AppKit/Swift rasterizer used in local prototypes: the same RGBA layer approach, with portability and an explicit font file.
 
-Quemar la capa después del balance de color. En HDR convertir primarias/transferencia del texto SDR antes de componer. Una caja amarilla que se ve apagada en un PNG sin tonemap no prueba que el master esté mal: inspeccionar en un reproductor HDR y usar una preview SDR convertida correctamente para comparaciones.
+Burn the layer after color balancing. For HDR, convert the SDR text's primaries/transfer before compositing. A yellow box that looks dull in a PNG without tone mapping does not prove the master is wrong: inspect it in an HDR player and use a correctly converted SDR preview for comparisons.
 
-## Entrega y revisiones
+## Delivery and revisions
 
-Preview primero, después master limpio de alta calidad, master con captions y SRT. Mantener cada versión aprobada, y cambiar solamente la parte solicitada en una corrección. Guardar plan, logs, métricas, inventario de fuentes y hashes. Comunicar versiones y limitaciones concretas. El bitrate alto ayuda, pero la revisión visual y el perfil de color importan más que el tamaño de archivo.
+Deliver a preview first, followed by a high-quality clean master, a captioned master, and an SRT file. Preserve each approved version and change only the requested part during a revision. Save the plan, logs, metrics, source inventory, and hashes. Communicate versions and specific limitations. A high bitrate helps, but visual review and the color profile matter more than file size.

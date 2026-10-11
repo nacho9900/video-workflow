@@ -1,30 +1,30 @@
-# Balance de color y referencia
+# Color balance and reference
 
-La referencia define una intención visual, no obliga a que una pizzería, una calle y un aeropuerto tengan idéntica luz. Analizar el frame original del master limpio; una miniatura SDR comprimida sirve para elegir, no para medir HDR. Pedir timestamp preciso y una región que se sepa neutra (camioneta blanca, camisa gris, etc.). No asumir que piel, cielo o pavimento son gris neutro.
+The reference defines a visual intention; it does not require a pizzeria, a street, and an airport to have identical lighting. Analyze the original frame from the clean master. A compressed SDR thumbnail can help select a frame, but cannot measure HDR. Ask for a precise timestamp and a region known to be neutral (a white van, a gray shirt, etc.). Do not assume that skin, sky, or pavement is neutral gray.
 
-El comando grade usa HLG/BT.2020, decodifica una muestra RGB16bit, selecciona píxeles de baja cromaticidad dentro de ROIs explícitas e invierte la curva HLG. Calcula ganancias RGB acotadas y una exposición moderada, genera curvas monotónicas de 33 puntos con PCHIP y preserva extremos negro/blanco. La referencia recibe parámetros cero. Es una corrección técnica aproximada, no un modelo de look cinematográfico; puede equivocarse si las ROIs no son realmente neutras.
+The grade command uses HLG/BT.2020, decodes a 16-bit RGB sample, selects low-chroma pixels within explicit ROIs, and inverts the HLG curve. It calculates bounded RGB gains and restrained exposure adjustments, generates monotonic 33-point curves with PCHIP, and preserves black/white endpoints. The reference receives zero adjustment parameters. This is an approximate technical correction rather than a cinematic look model; it can be wrong if the ROIs are not actually neutral.
 
 ```sh
 video-workflow grade outputs/v1/clean.mov examples/color-samples.json \
   --output outputs/v1/balanced.mov
 ```
 
-ROI: `[x0,y0,x1,y1]` normalizada 0..1. Samples seconds globales del master. `exposure_stops` opcional permite una corrección conservadora explícita; no pasar un sample en el mismo tiempo que reference.
+ROI: `[x0,y0,x1,y1]`, normalized to 0..1. Sample timestamps use global master seconds. The optional `exposure_stops` field allows an explicit conservative adjustment; do not provide a sample at the same timestamp as the reference.
 
-Para producción, incluir `edit_plan` (ruta relativa al JSON de color) y asignar `scene` (índice desde cero) a reference y cada sample. Agregar `broll` (índice desde cero) si el target es un plano de apoyo. Proveer una muestra por cada escena y cada B-roll, excepto el target elegido como referencia. El comando usa el plan compilado para mantener constantes los ajustes dentro de cada toma, y mezcla parámetros solamente en transiciones y fades de planos de apoyo. La referencia debe estar dentro de una toma estable, lejos de fades.
+For production, include `edit_plan` (a path relative to the color JSON file) and assign `scene` (a zero-based index) to the reference and each sample. Add `broll` (a zero-based index) when the target is a B-roll shot. Provide one sample per scene and per B-roll shot, except for the target chosen as the reference. The command uses the compiled plan to keep adjustments constant within each shot, blending parameters only during transitions and B-roll fades. The reference must fall within a stable shot, away from fades.
 
-Sin edit_plan, el modo exploratorio interpola suavemente entre anchors; puede hacer variar el color dentro de una toma. Usarlo solo para explorar o en pruebas sintéticas. Revisar la referencia tras exportar: se recomprime, no es pixel idéntica.
+Without edit_plan, exploratory mode interpolates smoothly between anchors; this can change the color within a shot. Use it only for exploration or synthetic tests. Inspect the reference after export: it is recompressed and will not be pixel-identical.
 
-No aplicar este matcher a PQ, Dolby Vision dinámico o mezclas SDR/HDR. No conservar metadata dinámica anterior después de alterar imagen sin un flujo específico. Esta entrega es HLG estándar de 10 bits.
+Do not apply this matcher to PQ, dynamic Dolby Vision, or SDR/HDR mixtures. Do not retain previous dynamic metadata after changing the image without a dedicated workflow. This workflow exports standard 10-bit HLG.
 
-## Selector pendiente
+## Pending selector improvement
 
-No se reutiliza el selector anterior. La mejora debe permitir:
+The previous selector is not reused. The improved selector should support:
 
-- Video o proxies adecuados para SDR/HDR con búsqueda precisa por frame, reproducción y teclado.
-- Identificar archivo, timestamp y frame, incluyendo FPS; no limitar a imágenes cada un segundo.
-- Ver varios candidatos grandes lado a lado y comparar piel/blancos/altas luces.
-- Seleccionar una ROI neutra y guardar JSON de timestamp/ROI con confirmación clara.
-- Separar selección de referencia de aprobación de la corrección con comparación antes/después.
+- Video or suitable SDR/HDR proxies with accurate frame seeking, playback, and keyboard controls.
+- Identification of the file, timestamp, and frame, including FPS; selection must not be limited to one image per second.
+- Large candidates viewed side by side to compare skin, whites, and highlights.
+- Selection of a neutral ROI and saving timestamp/ROI JSON with clear confirmation.
+- Separate reference selection and correction approval, using a before/after comparison.
 
-Hasta implementarlo: pedir timestamp usando un reproductor y confirmar con un frame grande. No instalar una app o crear un nuevo selector sin necesidad para la edición.
+Until it is implemented, ask for a timestamp from a player and confirm it with a large frame image. Do not install an app or build a new selector unless the edit requires it.

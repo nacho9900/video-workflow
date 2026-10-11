@@ -1,21 +1,21 @@
-# Validación y límites
+# Validation and limitations
 
-## Matriz verificada
+## Verified environment and checks
 
-Entorno de desarrollo: macOS Apple Silicon, Python 3.12.14, NumPy 2.3.5, Pillow 12.3.0, FFmpeg/ffprobe 9.0.2. La reproducción final depende también del reproductor/pantalla. No se ha certificado Linux/Windows ni todas las versiones aceptadas por los rangos de dependencias.
+Development environment: macOS on Apple Silicon, Python 3.12.14, NumPy 2.3.5, Pillow 12.3.0, and FFmpeg/ffprobe 9.0.2. Final playback also depends on the player and display. Linux/Windows and all versions allowed by the dependency ranges have not been certified.
 
-Checks que deben pasar: tests unitarios (timeline exacto, curvas HLG, captions, protección de salidas), smoke SDR y HLG por CPU a pequeña resolución. Las pruebas sintéticas no prueban gusto editorial, piel humana ni rendimiento 4K; verificar esos puntos en cada producción. Se comprobó también la instalación desde PyPI en un venv vacío con requirements.txt e instalación editable, sin paquetes del runtime anterior. Whisper requiere una comprobación real con el modelo elegido; no se incluye en los smoke tests.
+Required checks: unit tests (exact timeline, HLG curves, captions, and output protection), plus low-resolution SDR and HLG smoke tests using CPU encoding. Synthetic tests do not verify editorial taste, human skin tones, or 4K performance; check these for each production. Installation from PyPI was also verified in an empty virtual environment using requirements.txt and editable installation, without packages from the previous runtime. Whisper requires a real check with the selected model; it is not included in the smoke tests.
 
-## Por entrega
+## For each deliverable
 
-- Perfil ffprobe: dimensiones, orientación, FPS CFR, frame count, duración, HEVC Main10/yuv420p10le para HDR, primarias BT.2020, transferencia arib-std-b67 (HLG), matriz BT.2020nc y rango limitado.
-- Audio 48kHz, canales adecuados, duración igual al video dentro de 50ms, comienzos en cero. Escuchar uniones, consonantes, ruido, colas y sonoridad; normalización por escena no garantiza el pico final.
-- Decodificar el archivo entero con `video-workflow validate FILE --decode`; metadata correcta no descarta corrupción de frames.
-- Revisar principio, fin, todas las transiciones/B-roll y subtítulos en la entrega final. Abrir en un reproductor HDR; screenshots sin transformación no representan fielmente HLG.
-- Comparar SHA-256 de originales con el manifiesto del render. El hash se calcula en streaming para no cargar gigabytes en RAM.
-- Para etapas que copian audio, comparar su bitstream: `ffmpeg -v error -i FILE -map 0:a:0 -c:a copy -f hash -`. No comparar el hash de contenedores diferentes como prueba de igualdad de audio.
-- Guardar métricas, logs y archivos del plan con la versión. No cambiar una salida antigua con `-y` por conveniencia.
+- Inspect the ffprobe profile: dimensions, orientation, CFR frame rate, frame count, duration, HEVC Main10/yuv420p10le for HDR, BT.2020 primaries, arib-std-b67 transfer (HLG), BT.2020nc matrix, and limited range.
+- Check 48 kHz audio, appropriate channels, duration matching the video within 50 ms, and zero start times. Listen to joins, consonants, noise, tails, and loudness; normalization per scene does not guarantee the final peak.
+- Decode the entire file with `video-workflow validate FILE --decode`; correct metadata does not rule out corrupted frames.
+- Inspect the beginning, end, all transitions/B-roll, and captions in the final deliverable. Open it in an HDR player; screenshots without a color transformation do not faithfully represent HLG.
+- Compare original-file SHA-256 hashes with the render manifest. Hashes are computed in streaming chunks to avoid loading gigabytes into RAM.
+- For stages that copy audio, compare its bitstream: `ffmpeg -v error -i FILE -map 0:a:0 -c:a copy -f hash -`. Do not compare hashes of different containers as proof of identical audio.
+- Save metrics, logs, and plan files with the version. Do not overwrite an old output with `-y` for convenience.
 
-## Soporte actual
+## Current support
 
-Fuentes homogéneas con tags HLG/BT.2020 o SDR/BT.709; FPS destino entero; crop center-fill. Resampling de FPS y escalado no crean detalle. La preview reduce resolución. Grade solo masters portrait 9:16. El texto es una línea por caption; partir frases en varias entradas. El render falla si un caption no cabe en los márgenes. No hay interfaz editorial gráfica ni selector interactivo de referencia implementado.
+Homogeneous sources tagged HLG/BT.2020 or SDR/BT.709; integer destination FPS; center-fill cropping. Frame-rate resampling and scaling do not create detail. The preview reduces resolution. Grade supports only portrait 9:16 masters. Text uses one line per caption; split phrases into multiple entries. Rendering fails if a caption does not fit within the margins. No graphical editing interface or interactive reference selector has been implemented.

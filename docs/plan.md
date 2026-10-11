@@ -1,19 +1,19 @@
-# Plan de edición
+# Edit plan
 
-JSON, ver examples/plan.json. Las rutas se resuelven respecto al JSON, no al cwd. Usar plan editable con rutas relativas; el plan compilado guardado junto al render tiene rutas absolutas y tiempos resueltos para auditar esa ejecución.
+The plan is JSON; see examples/plan.json. Paths resolve relative to the JSON file, not the working directory. Use relative paths in the editable plan. The compiled plan saved alongside the render contains absolute paths and resolved timings to audit that run.
 
-Campos globales: profile (`hlg` o `sdr`), width/height pares, fps entero, bitrate, preview_bitrate, audio_overlap en segundos, audio_channels (`mono` o `stereo`), audio_filter (cadena FFmpeg opcional; vacío desactiva filtros de limpieza), scenes, transitions, captions. Audio normalizado por escena a -16 LUFS / -1.5dBTP en dos pasadas; revisar el master porque un crossfade puede cambiar el pico final. Mono es adecuado para una voz mono; mantener stereo cuando la fuente lo requiera.
+Global fields: profile (`hlg` or `sdr`), even width/height, integer fps, bitrate, preview_bitrate, audio_overlap in seconds, audio_channels (`mono` or `stereo`), audio_filter (an optional FFmpeg filter string; an empty string disables cleanup filters), scenes, transitions, and captions. Audio is normalized per scene to -16 LUFS / -1.5 dBTP in two passes; inspect the master because a crossfade can change the final peak. Mono is appropriate for a mono voice recording; preserve stereo when the source requires it.
 
-Escena: file, in/out en segundos del original, title, broll. Se ajustan tiempos a la rejilla de frames. B-roll: file, in (original), at (segundos relativos a la escena editada), duration, fade por cada extremo. No usa audio del B-roll. Si un B-roll necesita seguir sobre varias escenas, partirlo explícitamente o ampliar el renderer: no tratar `at` como un timestamp global.
+Scene fields: file, in/out in seconds of the original, title, and broll. Timings are snapped to the frame grid. B-roll fields: file, in (original source), at (seconds relative to the edited scene), duration, and fade at each end. B-roll audio is not used. If B-roll needs to continue across multiple scenes, split it explicitly or extend the renderer; do not treat `at` as a global timestamp.
 
-Una transición por unión: type y duration. Tipos: fadeblack, fade, smoothleft/right, zoomin, rollleft/right. Roll combina giro y zoom para cubrir bordes, con crossfade corto en el centro. El clip breve de apoyo puede entrar con fades de ~0.16s; una unión de lugares puede usar negro de ~0.5s o roll si acompaña el movimiento.
+Provide one transition per join: type and duration. Types: fadeblack, fade, smoothleft/right, zoomin, and rollleft/right. Roll combines rotation and zoom to cover the edges, with a short crossfade at the center. A brief supporting shot can enter with fades of approximately 0.16 seconds; a location change can use a dip to black of approximately 0.5 seconds or a roll that follows the movement.
 
-El audio_overlap determina el timeline de voz, independientemente de la duración del efecto visual. Se prolongan handles visuales con frames clonados para efectos mayores. La duración de transición, en frames, debe tener la misma paridad que audio_overlap y ser al menos ese solapamiento. Se rechazan escenas demasiado cortas. Cambiar los trims si se pisan palabras; no aumentar el overlap por estética.
+The audio_overlap field determines the narration timeline independently of the visual effect's duration. Visual handles are extended with cloned frames for longer effects. The transition duration, in frames, must have the same parity as audio_overlap and be at least as long as that overlap. Scenes that are too short are rejected. Change trims if words overlap; do not increase the overlap for visual styling.
 
-Captions del plan y examples/captions.json: start/end globales del master, text. Deben estar ordenados, sin solapamiento y dentro de duración. El renderer guarda captions en el plan pero no los quema; el comando captions toma una lista JSON independiente. Puede extraerse así:
+Captions in the plan and examples/captions.json use global master start/end timestamps and text. They must be ordered, non-overlapping, and within the video duration. The renderer saves captions in the plan but does not burn them in; the captions command takes a separate JSON list. Extract it as follows:
 
 ```sh
 python -c 'import json; p=json.load(open("outputs/v1/edit-plan.json")); json.dump(p["captions"],open("outputs/v1/captions.json","w"),ensure_ascii=False,indent=2)'
 ```
 
-La preview usa ancho 720, misma relación de aspecto y FPS; no es la entrega. El master conserva la resolución configurada. No aumentar resolución/FPS esperando recuperar detalle inexistente: configurar según las fuentes y el destino.
+The preview uses a width of 720 with the same aspect ratio and FPS; it is not the deliverable. The master preserves the configured resolution. Do not increase resolution/FPS expecting to recover detail that does not exist; configure these according to the sources and destination.
