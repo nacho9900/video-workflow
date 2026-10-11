@@ -1,0 +1,22 @@
+{
+  "profile": "hlg",
+  "width": 2160,
+  "height": 3840,
+  "fps": 60,
+  "bitrate": "75M",
+  "preview_bitrate": "8M",
+  "audio_overlap": 0.2,
+  "audio_channels": "mono",
+  "audio_filter": "highpass=f=70,afftdn=nr=6:nf=-35",
+  "scenes": [
+    {"title": "Opening", "file": "../inputs/opening.mov", "in": 1.2, "out": 7.2,
+      "broll": [{"file": "../inputs/detail.mov", "in": 2, "at": 2.5, "duration": 1.8, "fade": 0.16}]},
+    {"title": "Middle", "file": "../inputs/middle.mov", "in": 0.8, "out": 8.8, "broll": []},
+    {"title": "Closing", "file": "../inputs/closing.mov", "in": 1, "out": 7, "broll": []}
+  ],
+  "transitions": [
+    {"type": "fadeblack", "duration": 0.5},
+    {"type": "rollright", "duration": 0.5}
+  ],
+  "captions": []
+}

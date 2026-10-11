@@ -1,0 +1,9 @@
+{
+  "edit_plan": "plan.json",
+  "reference": {"seconds": 12, "scene": 1, "roi": [0.1, 0.5, 0.8, 0.8]},
+  "samples": [
+    {"seconds": 2, "scene": 0, "roi": [0.1, 0.35, 0.8, 0.8]},
+    {"seconds": 3.5, "scene": 0, "broll": 0, "roi": [0.2, 0.4, 0.7, 0.75], "exposure_stops": -0.04},
+    {"seconds": 16, "scene": 2, "roi": [0.1, 0.35, 0.8, 0.8]}
+  ]
+}

@@ -1,0 +1,4 @@
+# Exact Python library versions used in the verified development environment.
+# Python 3.11+; Python 3.12 recommended. FFmpeg and whisper.cpp are separate binaries.
+numpy==2.3.5
+Pillow==12.3.0

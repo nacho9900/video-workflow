@@ -1,0 +1,13 @@
+/inputs/
+/outputs/
+/.venv/
+/.work/
+/models/
+__pycache__/
+*.py[cod]
+*.egg-info/
+/build/
+/dist/
+.DS_Store
+.env
+.env.*
