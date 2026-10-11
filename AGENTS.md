@@ -1,39 +1,39 @@
-# Guía para agentes
+# Agent guide
 
-Este repositorio es un sistema de trabajo reutilizable. Leer README.md y docs/workflow.md; consultar setup, plan, color y validation antes de ejecutar esas etapas. Las instrucciones del usuario de la sesión tienen prioridad.
+This repository provides a reusable workflow. Read README.md and docs/workflow.md; consult the setup, plan, color, and validation documents before running those stages. The user's instructions in the current session take priority.
 
-## Resultado esperado
+## Expected result
 
-Producir un video completo y revisable, con voz clara, recortes que quiten preparación/ruidos del inicio y final sin comer palabras, planos de apoyo pertinentes, transiciones elegidas según el movimiento y subtítulos legibles. Mantener la resolución, los FPS y el rango dinámico cuando la fuente y el destino lo permitan. Nunca agregar música sin pedido; puede quedar para el usuario.
+Produce a complete, reviewable video with clear speech, trims that remove setup and unwanted noise at the beginning and end without cutting words, relevant B-roll, transitions chosen to suit movement, and readable captions. Preserve resolution, frame rate, and dynamic range when the sources and destination support them. Never add music unless requested; the user may add it later.
 
-## Archivos y versiones
+## Files and versions
 
-- Originals/referencias en inputs/, solo lectura. No mover, reemplazar, editar ni reescribir metadatos de originales.
-- Todo derivado, modelo descargado, transcripción, preview, log y entrega va en outputs/ o models/ (ignorados).
-- Cada corrección crea una versión nueva; conservar versiones aprobadas. Los comandos rechazan salidas existentes. Si una ejecución falla, usar otra carpeta o reparar solo sus intermediarios después de inspeccionarlos; nunca borrar entregas aprobadas para reintentar.
-- No subir media, transcripciones reales, modelos, fuentes con licencia, secretos ni entornos virtuales al repo. Revisar git status y git diff --cached antes de publicar cambios.
-- Guardar plan compilado, manifiesto SHA-256 de fuentes, doctor, mediciones y validación junto a la entrega.
+- Keep originals and reference videos in inputs/, read-only. Do not move, replace, edit, or rewrite the metadata of originals.
+- Store all derivatives, downloaded models, transcripts, previews, logs, and deliverables in outputs/ or models/ (both ignored by Git).
+- Create a new version for each revision; preserve approved versions. Commands reject existing outputs. If a run fails, use another directory or repair only its intermediate files after inspecting them; never delete approved deliverables to retry.
+- Do not commit media, actual production transcripts, models, licensed font files, secrets, or virtual environments. Review git status and git diff --cached before publishing changes.
+- Save the compiled edit plan, source SHA-256 manifest, doctor report, measurements, and validation results alongside the deliverables.
 
-## Herramientas
+## Tools
 
-- Python >=3.11, NumPy y Pillow declarados en requirements/pyproject. Crear un venv; no depender de runtimes privados del host.
-- FFmpeg + ffprobe: inventario, recortes, audio, montaje, transiciones, color, codificación y verificación. Ejecutar doctor primero. FFmpeg 9+ es la base por la conversión de primarias/transferencia de scale.
-- Whisper.cpp + un modelo explícito: transcripción local opcional; no instalar openai-whisper/PyTorch por inercia. Verificar su CLI y el preset DTW si se usa. Los timestamps necesitan escucha y corrección editorial.
-- Pillow + una fuente explícita: subtítulos animados portables. Texto amarillo brillante sobre caja negra; tamaño grande y frases cortas. Verificar márgenes en un teléfono; dividir una frase larga antes de achicarla.
-- VideoToolbox acelera Apple Silicon; usar software en otro host o si falla. Que un encoder aparezca en doctor no prueba que el sandbox permita acceder a la GPU. No cambiar a 8 bits para sortear un problema HDR.
+- Python >=3.11, with NumPy and Pillow declared in requirements.txt and pyproject.toml. Create a virtual environment; do not depend on private host runtimes.
+- FFmpeg + ffprobe: inventory, trimming, audio, montage, transitions, color, encoding, and verification. Run doctor first. FFmpeg 9+ is the baseline because the scale filter must support color primaries and transfer conversion.
+- Whisper.cpp + an explicitly selected model: optional local transcription. Do not install openai-whisper/PyTorch by habit. Verify the CLI and DTW preset when used. Timestamps require listening and editorial correction.
+- Pillow + an explicitly selected font file: portable animated captions. Use bright yellow text on a black box, a large font, and short phrases. Check margins on a phone; split a long phrase before shrinking the font.
+- VideoToolbox accelerates encoding on Apple Silicon; use software encoding on other hosts or if it fails. An encoder appearing in doctor does not prove the sandbox allows GPU access. Do not switch to 8-bit to work around an HDR problem.
 
-## Proceso obligatorio
+## Required process
 
-1. Aclarar únicamente información faltante que cambie el resultado. Después de eso avanzar hasta entregar. Analizar ejemplos del usuario, no inventar su estilo.
-2. Hacer inventario y escuchar/ver clips. Elegir in/out alrededor de voz útil; conservar respiraciones naturales y pequeñas colas. No decidir solo con silencedetect.
-3. Construir plan con orden explícito, inicio/cierre si son obligatorios y B-roll sobre voz original. No transcribir sonido de B-roll como narración.
-4. Corregir transcripción; ajustar timestamps a palabras. Crear captions globales, sin solapamiento, conservando el sentido de la frase.
-5. Probar en preview. Revisar transiciones en movimiento y uniones de audio con auriculares. Crossfade de audio corto e independiente del efecto visual. Si se solapan palabras, ajustar recortes/handles; no taparlo con un efecto.
-6. Renderizar master limpio. Si se pide color, analizar el frame HDR original y neutral ROI. Corregir moderadamente por toma; inspeccionar piel, blancos y altas luces. Usar grade con edit_plan para mantener parámetros por toma y suavizar solo en transiciones (docs/color.md).
-7. Quemar subtítulos después del color para no alterar su amarillo. Entregar ambos masters y SRT, sin cambiar montajes aprobados durante una corrección de color.
-8. Validar dimensiones, perfil, primarias, transferencia, profundidad, FPS, frame count, A/V y decodificación. Comparar hash del audio si una etapa promete copiarlo. Revisar frames y escuchar el archivo final, no solo el preview.
-9. Entregar links claros, versión y límites relevantes. No afirmar que una metadata HDR o un bitrate alto garantizan fidelidad visual.
+1. Clarify only missing information that affects the result. Then continue through delivery. Analyze the user's examples rather than inventing their style.
+2. Inventory the media and watch/listen to the clips. Choose in/out points around useful speech; preserve natural breaths and short tails. Do not rely solely on silencedetect.
+3. Build a plan with an explicit order, required opening/closing when specified, and B-roll over the original narration. Do not transcribe B-roll sound as narration.
+4. Correct the transcript and align timestamps with words. Create captions using global timeline timestamps, without overlaps, preserving each phrase's meaning.
+5. Test a preview. Review transitions in motion and audio joins with headphones. Keep audio crossfades short and independent of visual effects. If words overlap, adjust trims/handles; do not conceal the issue with an effect.
+6. Render a clean master. If color correction is requested, analyze the original HDR frame and a neutral ROI. Apply restrained corrections per shot; inspect skin, whites, and highlights. Use grade with edit_plan to keep parameters constant within shots and smooth changes only during transitions (docs/color.md).
+7. Burn captions after color correction to preserve their yellow. Deliver both masters and an SRT file, without changing an approved montage during a color revision.
+8. Validate dimensions, profile, primaries, transfer, bit depth, FPS, frame count, A/V timing, and decoding. Compare the audio bitstream hash when a stage promises to copy it. Inspect frames and listen to the final file, not just the preview.
+9. Deliver clear links, the version, and relevant limitations. Do not claim that HDR metadata or a high bitrate guarantees visual fidelity.
 
-## Limitaciones que no hay que ocultar
+## Limitations to disclose
 
-Estos scripts soportan masters CFR con FPS enteros y fuentes homogéneas HLG/BT.2020 o SDR/BT.709. PQ, Dolby Vision dinámico, material sin tags y mezclas SDR/HDR necesitan una conversión diseñada y verificada aparte. No retaggear una fuente para hacerla pasar por HDR. El recorte de encuadre es center-fill: revisar posición de persona/textos, adaptar si el sujeto queda fuera. El color sampler actual exige master vertical 9:16 y neutral ROIs explícitas. El selector visual de referencia es una mejora pendiente, no una función terminada.
+These scripts support CFR masters with integer frame rates and homogeneous HLG/BT.2020 or SDR/BT.709 sources. PQ, dynamic Dolby Vision, untagged media, and SDR/HDR mixtures require a separately designed and verified conversion. Do not retag a source to pass it off as HDR. Framing uses center-fill cropping: check the subject and text positions, and adapt the crop if the subject falls outside the frame. The current color sampler requires a vertical 9:16 master and explicit neutral ROIs. The visual reference selector is a pending improvement, not a completed feature.
